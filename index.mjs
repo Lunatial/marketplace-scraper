@@ -13,8 +13,6 @@ const maxPrice = process.env.MAX_PRICE;
 const emailAddress = process.env.MY_EMAIL;
 const emailPassword = process.env.APP_PASS;
 
-console.log(query, typeof query)
-
 const func = async () => {
     const browser = await puppeteer.launch({
         dumpio: true
@@ -26,18 +24,17 @@ const func = async () => {
     );
     await autoScroll(page);
 
-    let robiTitles = await page.evaluate(() => {
+    let robiTitles = await page.evaluate((query) => {
         const allElement = document.querySelectorAll('body > div > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div > div > div > div > div > div > span > div > div > a > div > div:nth-child(2) > div:nth-child(2) span span span')
-        // const allElement = document.querySelectorAll('body > div > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div > div > div > div > div > div > span > div > div > a > div > div:nth-child(2) > div:nth-child(2)')
 
         const result = Array.from(
             allElement
         )
             .map(title => title.innerText.toLowerCase())
-            .filter(item => item.includes('bmw'))
+            .filter(item => item.includes(query.toLowerCase()))
 
         return result
-    })
+    }, query)
     console.log(robiTitles)
     if(robiTitles.length > 0) {
         fs.writeFile("./test.txt", JSON.stringify(robiTitles), function (err) {
