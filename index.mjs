@@ -1,12 +1,19 @@
 import puppeteer from 'puppeteer';
 import fs from 'fs';
+import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 import {autoScroll, prepareItems} from './helpers.mjs';
+
+dotenv.config()
 
 // config
 const query = encodeURIComponent(process.env.SEARCH_QUERY);
 const city = encodeURIComponent(process.env.SEARCH_CITY);
 const maxPrice = process.env.MAX_PRICE;
-const asd = 'ford';
+const emailAddress = process.env.MY_EMAIL;
+const emailPassword = process.env.APP_PASS;
+
+console.log(query, typeof query)
 
 const func = async () => {
     const browser = await puppeteer.launch({
@@ -21,26 +28,48 @@ const func = async () => {
 
     let robiTitles = await page.evaluate(() => {
         const allElement = document.querySelectorAll('body > div > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div > div > div > div > div > div > span > div > div > a > div > div:nth-child(2) > div:nth-child(2) span span span')
-
+        // const allElement = document.querySelectorAll('body > div > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div > div > div > div > div > div > span > div > div > a > div > div:nth-child(2) > div:nth-child(2)')
 
         const result = Array.from(
             allElement
         )
             .map(title => title.innerText.toLowerCase())
-            .filter(item => item.includes('ford'))
+            .filter(item => item.includes('bmw'))
 
-        console.log(
-            result
-        )
         return result
     })
+    console.log(robiTitles)
+    if(robiTitles.length > 0) {
+        fs.writeFile("./test.txt", JSON.stringify(robiTitles), function (err) {
+            if (err) {
+                return console.log(err);
+            }
+            console.log("The file was saved!");
+        });
 
-    fs.writeFile("./test.txt", JSON.stringify(robiTitles), function (err) {
-        if (err) {
-            return console.log(err);
-        }
-        console.log("The file was saved!");
-    });
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+                user: emailAddress,
+                pass: emailPassword
+            }
+        });
+
+        const mailOptions = {
+            from: emailAddress,
+            to: emailAddress,
+            subject: 'Értesítés',
+            html: `<p>${JSON.stringify(robiTitles)}</p>`
+        };
+
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log(error);
+            } else {
+                console.log("Email sent: " + info.response);
+            }
+        });
+    }
 
     // let titles = await page.evaluate(() =>
     //   Array.from(

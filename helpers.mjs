@@ -15,6 +15,9 @@ export async function autoScroll(page) {
       }, 100);
     });
   });
+  // await page.evaluate(() => {
+  //   window.scrollTo(0,window.document.body.scrollHeight);
+  // });
 }
 
 export async function prepareItems(titles, prices, urls) {
@@ -29,6 +32,6 @@ export async function prepareItems(titles, prices, urls) {
 
     items.push(item);
   }
-  
+
   return items;
 }
