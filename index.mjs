@@ -35,7 +35,19 @@ const func = async () => {
 
         return result
     }, query)
-    console.log(robiTitles)
+
+    let robiPrices = await page.evaluate((maxPrice) => {
+        const allElement = document.querySelectorAll('body > div > div > div:nth-child(1) > div > div > div > div > div > div > div > div > div > div > div > div > div > div > span > div > div > a > div > div:nth-child(2) > div:nth-child(1) span div span')
+
+        const result = Array.from(
+            allElement
+        )
+            .map(title => title.innerText)
+            .filter(item => item.substring(0, item.length - 1))
+
+        return result
+    }, maxPrice)
+    console.log(robiPrices)
     if(robiTitles.length > 0) {
         fs.writeFile("./test.txt", JSON.stringify(robiTitles), function (err) {
             if (err) {
