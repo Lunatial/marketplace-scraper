@@ -73,7 +73,9 @@ const func = async () => {
             from: emailAddress,
             to: emailAddress,
             subject: 'Értesítés',
-            html: `<p>${JSON.stringify(robiTitles)}</p>`
+            html: `<body><ul>${JSON.stringify(robiTitles.map(item => {
+                return `<li>${item}</li>`
+            }))}</ul></body>`
         };
 
         transporter.sendMail(mailOptions, function(error, info) {
