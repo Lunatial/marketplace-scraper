@@ -42,8 +42,13 @@ const func = async () => {
         const result = Array.from(
             allElement
         )
-            .map(title => title.innerText)
-            .filter(item => item.substring(0, item.length - 1))
+            .map(price => {
+                const item = price.innerText
+                const preNumber = item.substring(0, item.length - 2).replace(/\D/g, "")
+                const number = parseInt(preNumber, 10)
+                return number
+            })
+            .filter(number => number > 100 && number < maxPrice)
 
         return result
     }, maxPrice)
